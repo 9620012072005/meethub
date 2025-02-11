@@ -1,0 +1,16 @@
+.text-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+  }
+  
+  .stroke-text {
+    font-family: "Pacifico", cursive; /* A nice handwritten font */
+    font-size: 50px;
+    fill: transparent;
+    stroke: white;
+    stroke-width: 2;
+  }
+  
