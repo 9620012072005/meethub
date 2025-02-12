@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography, Paper, Avatar } from "@mui/material";
 import { gsap } from "gsap";
-import axios from "axios";
+
+import api from "../api";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -49,7 +50,8 @@ const Register = () => {
     }
   
     try {
-      const response = await axios.post("http://localhost:5000/api/users/register", formData, {
+      // Use `api.post` instead of axios.post with a hardcoded URL
+      const response = await api.post("/users/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
