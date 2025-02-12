@@ -1,8 +1,10 @@
 import axios from "axios";
 
+const API_BASE_URL = "https://meethub-backend.onrender.com/api"; // ✅ Backend URL (Ensure /api is included)
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://meethub-backend.onrender.com/api/",
-  withCredentials: true, // Ensures authentication tokens (JWT) are sent
+  baseURL: API_BASE_URL,
+  withCredentials: true, // ✅ Allows cookies & authentication headers
 });
 
 export default api;
