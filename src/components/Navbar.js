@@ -145,7 +145,7 @@ const Navbar = () => {
                   transition: "transform 0.3s",
                   display: { xs: "none", sm: "inline-block" },
                 }}
-                src={user.avatar ? `http://localhost:5000${user.avatar}` : "/default-avatar.png"}
+                src={user.avatar ? `http://localhost:5000/api/${user.avatar}` : "/default-avatar.png"}
                 alt={user.name || "User"}
                 onClick={() => (window.location.href = "/profile")}
                 onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3 })}
@@ -190,7 +190,7 @@ const Navbar = () => {
                 cursor: "pointer",
                 transition: "transform 0.3s",
               }}
-              src={user.avatar ? `http://localhost:5000${user.avatar}` : "/default-avatar.png"}
+              src={user.avatar ? `http://localhost:5000/api/${user.avatar}` : "/default-avatar.png"}
               alt={user.name || "User"}
               onClick={() => (window.location.href = "/profile")}
               onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3 })}
@@ -224,7 +224,7 @@ const Navbar = () => {
               cursor: "pointer",
               transition: "transform 0.3s",
             }}
-            src={user?.avatar ? `http://localhost:5000${user.avatar}` : "/default-avatar.png"}
+            src={user?.avatar ? `http://localhost:5000/api/${user.avatar}` : "/default-avatar.png"}
             alt={user?.name || "User"}
             onClick={() => (window.location.href = "/profile")}
             onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3 })}
