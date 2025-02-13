@@ -224,7 +224,7 @@ const Navbar = () => {
               cursor: "pointer",
               transition: "transform 0.3s",
             }}
-            src={user?.avatar ? `https://meethub-backend.onrender.com${user.avatar}` : "/default-avatar.png"}
+            src={user?.avatar ? `http://localhost:5000${user.avatar}` : "/default-avatar.png"}
             alt={user?.name || "User"}
             onClick={() => (window.location.href = "/profile")}
             onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.2, duration: 0.3 })}
