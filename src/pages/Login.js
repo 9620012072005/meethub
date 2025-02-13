@@ -31,7 +31,7 @@ const Login = () => {
     setLoading(true);
   
     try {
-      const response = await axios.post("http://localhost:5000/api/users/login", {
+      const response = await api.post("https://meethub-backend.onrender.com/api/users/login", {
         email,
         password,
       }, {
