@@ -15,6 +15,7 @@ import {
  
   FaSmile,
 } from "react-icons/fa"; // Added More Icons
+import api from "../api";
 
 const Loader = () => {
   const loaderRef = useRef(null);

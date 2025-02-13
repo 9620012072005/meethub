@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from "../api";
 
 const UserList = ({ onSelectUser }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data } = await axios.get('/api/users');
+      const { data } = await api.get('https://meethub-backend.onrender.com/api/users');
       setUsers(data);
     };
     fetchUsers();

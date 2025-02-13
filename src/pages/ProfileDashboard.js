@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
+import api from "../api";
 
 const ProfileDashboard = ({ user }) => {
   const [about, setAbout] = useState(user?.about || "");
@@ -37,8 +38,8 @@ const ProfileDashboard = ({ user }) => {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/profiledetails", // API route for storing profile data
+      const response = await api.post(
+        "https://meethub-backend.onrender.com/api/profiledetails", // API route for storing profile data
         profileData,
         {
           headers: {
@@ -78,7 +79,7 @@ const ProfileDashboard = ({ user }) => {
   };
 
   return (
-    <Card className="dashboard-card" sx={{ marginTop: 3, padding: 3, backgroundColor: "#fff", boxShadow: 3, borderRadius: 2, }}>
+    <Card className="dashboard-card" sx={{ marginTop: 3, padding: 3, backgroundColor: "#fff", boxShadow: 3, borderRadius: 2 }}>
       <Typography variant="h6" sx={{ fontWeight: "bold", color: "#333" }}>Dashboard</Typography>
 
       {!showForm ? (

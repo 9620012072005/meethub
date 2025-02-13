@@ -24,6 +24,7 @@ import axios from "axios";
 import CommentSection from "./CommentSection";
 import { gsap } from "gsap";
 import CloseIcon from "@mui/icons-material/Close";
+import api from "../api";
 
 const PostCard = ({ postId, user = "Anonymous", content = "No content available", userId }) => {
   const [likeCount, setLikeCount] = useState(0);
@@ -63,7 +64,7 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
       }
   
       try {
-        const response = await axios.get(`http://localhost:5000/api/posts/${postId}`, {
+        const response = await api.get(`https://meethub-backend.onrender.com/api/posts/${postId}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` },
         });
   
@@ -108,8 +109,8 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
     setTempLike(true); // Change color to red instantly
   
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/posts/${postId}/like`,
+      const response = await api.post(
+        `https://meethub-backend.onrender.com/api/posts/${postId}/like`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` } }
       );
@@ -180,7 +181,7 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
 
   const handleDeletePost = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+      await api.delete(`https://meethub-backend.onrender.com/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` },
       });
       alert("Post deleted successfully.");
@@ -208,8 +209,8 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
     if (newImage) formData.append("image", newImage);
   
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/posts/${postId}`,
+      const response = await api.put(
+        `https://meethub-backend.onrender.com/api/posts/${postId}`,
         formData,
         {
           headers: {

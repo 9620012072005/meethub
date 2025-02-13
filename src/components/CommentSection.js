@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import axios from "axios";
+import api from "../api";
 
 const CommentSection = ({ postId, onNewComment }) => {
   const [comments, setComments] = useState([]);
@@ -19,7 +20,7 @@ const CommentSection = ({ postId, onNewComment }) => {
 
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/api/posts/${postId}/comments`);
+        const response = await api.get(`https://meethub-backend.onrender.com/api/posts/${postId}/comments`);
         setComments(response.data);
         setError("");
       } catch (err) {
@@ -49,8 +50,8 @@ const CommentSection = ({ postId, onNewComment }) => {
 
     try {
       const token = localStorage.getItem("userToken");
-      await axios.post(
-        `http://localhost:5000/api/posts/${postId}/comments`,
+      await api.post(
+        `https://meethub-backend.onrender.com/api/posts/${postId}/comments`,
         { comment: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );

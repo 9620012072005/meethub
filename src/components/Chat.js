@@ -4,6 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import api from "../api";
 const Chat = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Chat = () => {
     const fetchProfiles = async () => {
       try {
         const token = localStorage.getItem("userToken");
-        const response = await axios.get("http://localhost:5000/api/profiles", {
+        const response = await api.get("https://meethub-backend.onrender.com/api/profiles", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfiles(response.data.users || []);
@@ -54,7 +55,7 @@ const Chat = () => {
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
   
         // ✅ Fetch the logged-in user's details
-        const currentUserResponse = await axios.get("http://localhost:5000/api/users/auth/currentUser", {
+        const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -67,7 +68,7 @@ const Chat = () => {
         console.log("✅ Current User Data:", currentUserResponse.data);
   
         // ✅ Fetch messages
-        const messagesResponse = await axios.get(`http://localhost:5000/api/messages/${userId}`, {
+        const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -75,7 +76,7 @@ const Chat = () => {
         console.log("✅ Messages Fetched:", messagesResponse.data.messages);
   
         // ✅ Fetch receiver's user details
-        const userResponse = await axios.get(`http://localhost:5000/api/users/${userId}`, {
+        const userResponse = await api.get(`https://meethub-backend.onrender.com/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -91,7 +92,7 @@ const Chat = () => {
     fetchChatData();
   
     // Initialize socket connection
-    socket.current = io("http://localhost:5000");
+    socket.current = io("https://meethub-backend.onrender.com");
   
     socket.current.on("typing", () => {
       setIsTyping(true);
@@ -134,8 +135,8 @@ const Chat = () => {
         const token = localStorage.getItem("userToken");
   
         // Send message to backend
-        await axios.post(
-          "http://localhost:5000/api/messages/send",
+        await api.post(
+          "https://meethub-backend.onrender.com/api/messages/send",
           { receiverId: userId, content: message },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -155,7 +156,7 @@ const Chat = () => {
   };
 
   const getAvatarUrl = (avatarPath) => {
-    return avatarPath ? `http://localhost:5000${avatarPath}` : "/default-avatar.png";
+    return avatarPath ? `https://meethub-backend.onrender.com${avatarPath}` : "/default-avatar.png";
   };
   useEffect(() => {
     const fetchChatData = async () => {
@@ -166,7 +167,7 @@ const Chat = () => {
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
 
         // ✅ Fetch messages
-        const messagesResponse = await axios.get(`http://localhost:5000/api/messages/${userId}`, {
+        const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -174,7 +175,7 @@ const Chat = () => {
         setMessages(messagesResponse.data.messages || []);
 
         // ✅ Fetch user details
-        const userResponse = await axios.get(`http://localhost:5000/api/users/${userId}`, {
+        const userResponse = await api.get(`https://meethub-backend.onrender.com/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -197,7 +198,7 @@ const Chat = () => {
     fetchChatData();
 
     // ✅ Initialize socket connection
-    socket.current = io("http://localhost:5000");
+    socket.current = io("https://meethub-backend.onrender.com");
 
   socket.current.on("typing", () => setIsTyping(true));
   socket.current.on("stop_typing", () => setIsTyping(false));

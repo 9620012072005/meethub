@@ -15,6 +15,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
+import api from "../api";
 
 const ProfileList = () => {
   const [profiles, setProfiles] = useState([]);
@@ -30,7 +31,7 @@ const ProfileList = () => {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("http://localhost:5000");
+      socket.current = io("https://meethub-backend.onrender.com");
     }
 
     // Join socket room when the component mounts
@@ -78,8 +79,8 @@ const ProfileList = () => {
           throw new Error("No authentication token found. Please login again.");
         }
 
-        const response = await axios.get(
-          `http://localhost:5000/api/users/profiles?page=${page}`,
+        const response = await api.get(
+          `https://meethub-backend.onrender.com/api/users/profiles?page=${page}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -170,7 +171,7 @@ const ProfileList = () => {
               >
                 <Avatar
                   alt={profile.name}
-                  src={profile.avatar ? `http://localhost:5000${profile.avatar}` : "/default-avatar.png"}
+                  src={profile.avatar ? `https://meethub-backend.onrender.com${profile.avatar}` : "/default-avatar.png"}
                   sx={{ width: 50, height: 50, marginRight: 2 }}
                 />
               </Badge>

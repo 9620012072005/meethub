@@ -7,6 +7,7 @@ import axios from "axios";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { gsap } from "gsap";
+import api from "../api";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -26,7 +27,7 @@ const Profile = () => {
     if (token) {
      
       // Fetch all profiles
-      axios.get("http://localhost:5000/api/profiledetails/all", { 
+      api.get("https://meethub-backend.onrender.com/api/profiledetails/all", { 
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -46,7 +47,7 @@ const Profile = () => {
     const token = localStorage.getItem("userToken");
 
     if (token) {
-      axios.get("http://localhost:5000/api/profiledetails", {
+      api.get("https://meethub-backend.onrender.com/api/profiledetails", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -64,8 +65,8 @@ const Profile = () => {
         }
       });
 
-      axios
-        .get("http://localhost:5000/api/users/profile", {
+      api
+        .get("https://meethub-backend.onrender.com/api/users/profile", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -108,7 +109,7 @@ const Profile = () => {
   
     try {
       // Step 1: Check if profile details exist (GET request)
-      const checkResponse = await axios.get("http://localhost:5000/api/profiledetails", {
+      const checkResponse = await api.get("https://meethub-backend.onrender.com/api/profiledetails", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -117,15 +118,15 @@ const Profile = () => {
   
       // Step 2: Determine whether to perform POST (create) or PUT (update)
       const url = profileExists
-        ? "http://localhost:5000/api/profiledetails/update" // PUT if profile exists
-        : "http://localhost:5000/api/profiledetails"; // POST if no profile found
+        ? "https://meethub-backend.onrender.com/api/profiledetails/update" // PUT if profile exists
+        : "https://meethub-backend.onrender.com/api/profiledetails"; // POST if no profile found
   
       const method = profileExists ? "PUT" : "POST";
   
       console.log(`${profileExists ? "Updating" : "Creating"} profile details...`);
   
       // Step 3: Perform the API request
-      const response = await axios({
+      const response = await api({
         method,
         url,
         data: profileData,
@@ -155,7 +156,7 @@ const Profile = () => {
         
         // If GET request fails (profile not found), try creating a new one (POST)
         try {
-          const response = await axios.post("http://localhost:5000/api/profiledetails", profileData, {
+          const response = await api.post("https://meethub-backend.onrender.com/api/profiledetails", profileData, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -205,7 +206,7 @@ const Profile = () => {
     }
   
     try {
-      const response = await axios.delete("http://localhost:5000/api/profiledetails/delete", {
+      const response = await api.delete("https://meethub-backend.onrender.com/api/profiledetails/delete", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -242,7 +243,7 @@ return (
         transition: "transform 0.3s ease-in-out",
         "&:hover": { transform: "scale(1.1)" },
       }}
-      src={user.avatar ? `http://localhost:5000${user.avatar}` : "/default-avatar.png"}
+      src={user.avatar ? `https://meethub-backend.onrender.com${user.avatar}` : "/default-avatar.png"}
       alt={user.name || "User"}
     >
       {user.name?.[0]?.toUpperCase() || "?"}
@@ -398,7 +399,7 @@ return (
       <CardContent>
         {/* Display Avatar */}
         <Avatar 
-          src={profile.user?.avatar ? `http://localhost:5000${profile.user.avatar}` : "/default-avatar.png"} 
+          src={profile.user?.avatar ? `https://meethub-backend.onrender.com${profile.user.avatar}` : "/default-avatar.png"} 
           sx={{ width: 80, height: 80, margin: "auto" }} 
         />
 

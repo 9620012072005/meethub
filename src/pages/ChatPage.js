@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
+import api from "../api";
 
-const socket = io("http://localhost:5000"); // Backend URL
+const socket = io("https://meethub-backend.onrender.com"); // Backend URL
 
 const ChatPage = () => {
   const [users, setUsers] = useState([]);
@@ -13,7 +14,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     // Fetch all users
-    axios.get("http://localhost:5000/users").then((response) => {
+    api.get("https://meethub-backend.onrender.com/api/users").then((response) => {
       setUsers(response.data);
     });
 
@@ -32,7 +33,7 @@ const ChatPage = () => {
 
   const loadMessages = (user) => {
     setSelectedUser(user);
-    axios.get("http://localhost:5000/api/users")
+    api.get("https://meethub-backend.onrender.com/api/users")
     .then(response => console.log(response.data))
     .catch(error => console.error(error));
   
@@ -45,7 +46,7 @@ const ChatPage = () => {
       receiver: selectedUser.email,
       content: newMessage,
     };
-    axios.post("http://localhost:5000/messages", message).then(() => {
+    api.post("https://meethub-backend.onrender.com/api/messages", message).then(() => {
       setNewMessage("");
     });
   };

@@ -15,6 +15,7 @@ import Navbar from "../components/Navbar";
 import PostCard from "../components/PostCard";
 import axios from "axios";
 import gsap from "gsap";
+import api from "../api";
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -28,7 +29,7 @@ const Feed = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/posts"); // Adjust URL as needed
+        const response = await api.get("https://meethub-backend.onrender.com/api/posts"); // Adjust URL as needed
         setPosts(response.data);
         animatePosts();
       } catch (error) {
@@ -88,7 +89,7 @@ const Feed = () => {
         formData.append("image", newPostImage);
       }
 
-      const response = await axios.post("http://localhost:5000/api/posts", formData, {
+      const response = await api.post("https://meethub-backend.onrender.com/api/posts", formData, {
         headers: {
           Authorization:`Bearer ${token}`,
           "Content-Type": "multipart/form-data",
