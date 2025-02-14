@@ -58,7 +58,7 @@ const Register = () => {
 
     try {
       // Use `api.post` instead of axios.post with a hardcoded URL
-      const response = await api.post("/api/users/register", formData, {
+      const response = await api.post("/users/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
