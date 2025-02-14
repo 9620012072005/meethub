@@ -9,6 +9,7 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   // GSAP animation
   useEffect(() => {
@@ -23,6 +24,7 @@ const Register = () => {
     const file = e.target.files[0];
     if (file) {
       setAvatar(file);
+      setAvatarPreview(URL.createObjectURL(file)); // Store preview separately
     }
   };
 
@@ -51,7 +53,9 @@ const Register = () => {
   
     try {
       // Use `api.post` instead of axios.post with a hardcoded URL
-      const response = await api.post("https://meethub-backend.onrender.com/api/users/register", formData, {
+      console.log("🛠️ Sending FormData:", Object.fromEntries(formData.entries()));
+      const response = await api.post("/api/users/register", formData, {
+
 
         headers: {
           "Content-Type": "multipart/form-data",
@@ -143,24 +147,17 @@ const Register = () => {
           >
             Upload Avatar
             <input
-              type="file"
-              hidden
-              onChange={handleAvatarChange}
-              accept="image/*"
-            />
+  type="file"
+  style={{ display: "none" }}
+  onChange={handleAvatarChange}
+  accept="image/jpeg, image/png, image/jpg"
+/>
+
           </Button>
-          {avatar && (
-            <Avatar
-              alt="Avatar Preview"
-              src={URL.createObjectURL(avatar)}
-              sx={{
-                width: 60,
-                height: 60,
-                margin: "10px auto",
-                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
-              }}
-            />
-          )}
+          {avatarPreview && (
+  <Avatar alt="Avatar Preview" src={avatarPreview} sx={{ width: 60, height: 60, margin: "10px auto" }} />
+)}
+
 
           <Button
             type="submit"
