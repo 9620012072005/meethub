@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography, Paper, Avatar } from "@mui/material";
 import { gsap } from "gsap";
-
 import api from "../api";
 
 const Register = () => {
@@ -21,8 +20,8 @@ const Register = () => {
   }, []);
 
   const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       setAvatar(file);
       setAvatarPreview(URL.createObjectURL(file)); // Store preview separately
     }
@@ -30,48 +29,53 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate inputs before sending to the server
     if (!name.trim() || !email.trim() || !password.trim()) {
       alert("All fields are required.");
       return;
     }
-  
+
     if (!/\S+@\S+\.\S+/.test(email)) {
       alert("Please enter a valid email address.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
     formData.append("password", password);
-  
+
     if (avatar) {
       formData.append("avatar", avatar);
     }
-  
+
+    // Debugging FormData (Ensuring it's not undefined)
+    console.log("🛠️ Sending FormData:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
     try {
       // Use `api.post` instead of axios.post with a hardcoded URL
-      console.log("🛠️ Sending FormData:", Object.fromEntries(formData.entries()));
       const response = await api.post("/api/users/register", formData, {
-
-
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-  
-      if (response.status === 201) {
+
+      console.log("✅ Registration Response:", response?.data);
+
+      if (response?.status === 201) {
         alert("Registration successful! Please log in.");
         window.location.href = "/login";
       }
     } catch (error) {
-      console.error("Error during registration:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Password must include at least one uppercase letter, one number, and one special character.");
+      console.error("❌ Registration Error:", error?.response?.data || error.message);
+      alert(error?.response?.data?.message || "Something went wrong. Please try again.");
     }
   };
-  
+
   return (
     <Box
       sx={{
@@ -147,17 +151,16 @@ const Register = () => {
           >
             Upload Avatar
             <input
-  type="file"
-  style={{ display: "none" }}
-  onChange={handleAvatarChange}
-  accept="image/jpeg, image/png, image/jpg"
-/>
-
+              type="file"
+              style={{ display: "none" }}
+              onChange={handleAvatarChange}
+              accept="image/jpeg, image/png, image/jpg"
+            />
           </Button>
-          {avatarPreview && (
-  <Avatar alt="Avatar Preview" src={avatarPreview} sx={{ width: 60, height: 60, margin: "10px auto" }} />
-)}
 
+          {avatarPreview && (
+            <Avatar alt="Avatar Preview" src={avatarPreview} sx={{ width: 60, height: 60, margin: "10px auto" }} />
+          )}
 
           <Button
             type="submit"
