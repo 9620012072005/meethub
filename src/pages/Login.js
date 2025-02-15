@@ -52,6 +52,8 @@ const Login = () => {
         navigate("/feed");
       }
     } catch (err) {
+      console.log("📌 Sending Password:", password);
+
       console.error("Login error:", err);  // Log full error object for debugging
       setError(err.response?.data?.error || "Login failed. Please try again.");
     } finally {
