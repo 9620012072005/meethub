@@ -32,7 +32,7 @@ const Login = () => {
     setLoading(true);
   
     try {
-      const response = await api.post("https://meethub-backend.onrender.com/api/users/login", {
+      const response = await api.post("/api/users/login", {
         email,
         password,
       }, {
