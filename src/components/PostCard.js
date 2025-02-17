@@ -49,8 +49,9 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const [post, setPost] = useState(null); // Add state to hold post details
   const hasLiked = post?.likes?.some((like) => like.userId === userId) || false;
-  
+  const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
 
+  const avatarURL = user?.avatar ? `${cloudinaryBaseURL}${user.avatar}` : "/default-avatar.png";
 
 
   const handleOpen = () => setOpen(true);
@@ -264,7 +265,7 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
 >
     {/* Avatar Button */}
       <Avatar
-        src={user?.avatar || "https://res.cloudinary.com/your_cloud_name/image/upload/v123456789/default_avatar.png"}
+       src={avatarURL}
         alt="User Avatar"
         sx={{
           width: 50,
