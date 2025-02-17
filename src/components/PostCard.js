@@ -46,12 +46,15 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
   const cardRef = useRef(null);
   const imageRef = useRef(null);
   const dialogRef = useRef(null);
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const [post, setPost] = useState(null); // Add state to hold post details
   const hasLiked = post?.likes?.some((like) => like.userId === userId) || false;
-  const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
+   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  const avatarURL = user?.avatar ? user.avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
+   const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
+  
+  // Ensure proper avatar URL handling
+ const avatarURL = avatar ? avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
+
 
   const handleOpen = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
