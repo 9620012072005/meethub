@@ -51,7 +51,8 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
   const hasLiked = post?.likes?.some((like) => like.userId === userId) || false;
   const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
 
-  const avatarURL = user?.avatar ? `${cloudinaryBaseURL}${user.avatar}` : "/default-avatar.png";
+
+  const avatarURL = user?.avatar ? `${cloudinaryBaseURL}${user?.avatar}` : "/default-avatar.png";
 
 
   const handleOpen = () => setOpen(true);
@@ -68,7 +69,8 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
         const response = await api.get(`https://meethub-backend.onrender.com/api/posts/${postId}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` },
         });
-  
+        console.log(avatarURL);  // Log the constructed URL for debugging
+
         console.log("Fetched Post Data:", response.data);
         const { user, likes = [], comments = [], image: postImage, userId: postUserId } = response.data.post;
   
