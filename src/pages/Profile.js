@@ -246,7 +246,7 @@ return (
         transition: "transform 0.3s ease-in-out",
         "&:hover": { transform: "scale(1.1)" },
       }}
-      src={user?.avatar || '/default-avatar.png'}
+      src={user.avatar || '/default-avatar.png'}
       alt={user.name || "User"}
     >
       {user.name?.[0]?.toUpperCase() || "?"}
