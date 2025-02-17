@@ -22,6 +22,7 @@ const Profile = () => {
   const roles = ["Software Developer", "Web Designer", "Student", "Working Professional"];
   const avatarURL = avatar ? avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
 
+
   useEffect(() => {
     const token = localStorage.getItem("userToken");
   
@@ -244,7 +245,7 @@ return (
         transition: "transform 0.3s ease-in-out",
         "&:hover": { transform: "scale(1.1)" },
       }}
-      src={profile.avatar ? profile.avatar : "/default-avatar.png"}  
+      src={user?.avatar ? `${cloudinaryBaseURL}${user.avatar}` : "/default-avatar.png"}
       alt={user.name || "User"}
     >
       {user.name?.[0]?.toUpperCase() || "?"}
@@ -401,6 +402,7 @@ return (
         {/* Display Avatar */}
         <Avatar 
         src={profile.avatar ? `${cloudinaryBaseURL}${profile.avatar}` : "/default-avatar.png"}
+
           sx={{ width: 80, height: 80, margin: "auto" }} 
         />
 
