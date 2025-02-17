@@ -244,7 +244,7 @@ return (
         transition: "transform 0.3s ease-in-out",
         "&:hover": { transform: "scale(1.1)" },
       }}
-      src={user.avatar ? `${cloudinaryBaseURL}${user.avatar}` : "/default-avatar.png"} 
+      src={profile.user?.avatar ? `${cloudinaryBaseURL}${profile.user.avatar}` : "/default-avatar.png"}  
       alt={user.name || "User"}
     >
       {user.name?.[0]?.toUpperCase() || "?"}
@@ -400,7 +400,7 @@ return (
       <CardContent>
         {/* Display Avatar */}
         <Avatar 
-          src={user.avatar ? `${cloudinaryBaseURL}${user.avatar}` : "/default-avatar.png"} 
+         src={profile.user?.avatar ? `${cloudinaryBaseURL}${profile.user.avatar}` : "/default-avatar.png"}  
           sx={{ width: 80, height: 80, margin: "auto" }} 
         />
 
