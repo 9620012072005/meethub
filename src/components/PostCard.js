@@ -51,9 +51,7 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
   const hasLiked = post?.likes?.some((like) => like.userId === userId) || false;
   const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
 
-
-  const avatarURL = user?.avatar ? `${cloudinaryBaseURL}${user?.avatar}` : "/default-avatar.png";
-
+  const avatarURL = user?.avatar ? user.avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
 
   const handleOpen = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
