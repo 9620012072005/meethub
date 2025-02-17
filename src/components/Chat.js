@@ -18,9 +18,8 @@ const Chat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
-
-  const storedUser = localStorage.getItem("currentUser");
-  const currentUserId = currentUser?.id; // Extract id properly
+  const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+  const currentUserId = currentUser?._id; // Set currentUserId properly
   console.log("Current User ID:", currentUserId);
   
 
@@ -156,7 +155,8 @@ const Chat = () => {
   };
 
   const getAvatarUrl = (avatarPath) => {
-    return avatarPath ? `https://meethub-backend.onrender.com${avatarPath}` : "/default-avatar.png";
+    const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
+    return avatarPath ? `${cloudinaryBaseURL}${avatarPath}` : "/default-avatar.png";
   };
   useEffect(() => {
     const fetchChatData = async () => {
