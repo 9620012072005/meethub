@@ -20,7 +20,8 @@ const Profile = () => {
   const [allProfiles, setAllProfiles] = useState([]); // Store all profiles
   const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
   const roles = ["Software Developer", "Web Designer", "Student", "Working Professional"];
-  const avatarURL = avatar ? avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
+  const avatarURL = user?.avatar ? user.avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
+
 
 
   useEffect(() => {
@@ -245,7 +246,7 @@ return (
         transition: "transform 0.3s ease-in-out",
         "&:hover": { transform: "scale(1.1)" },
       }}
-      src={user?.avatar ? `${cloudinaryBaseURL}${user.avatar}` : "/default-avatar.png"}
+      src={user?.avatar || '/default-avatar.png'}
       alt={user.name || "User"}
     >
       {user.name?.[0]?.toUpperCase() || "?"}
@@ -401,7 +402,7 @@ return (
       <CardContent>
         {/* Display Avatar */}
         <Avatar 
-        src={profile.avatar ? `${cloudinaryBaseURL}${profile.avatar}` : "/default-avatar.png"}
+          src={profile.user.avatar || '/default-avatar.png'}
 
           sx={{ width: 80, height: 80, margin: "auto" }} 
         />
