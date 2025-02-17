@@ -264,7 +264,7 @@ const PostCard = ({ postId, user = "Anonymous", content = "No content available"
 >
     {/* Avatar Button */}
       <Avatar
-        src={avatar || "/default-avatar.png"}
+        src={user?.avatar || "https://res.cloudinary.com/your_cloud_name/image/upload/v123456789/default_avatar.png"}
         alt="User Avatar"
         sx={{
           width: 50,
