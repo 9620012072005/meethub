@@ -53,7 +53,7 @@ const Chat = () => {
   
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
   
-        // ✅ Fetch the logged-in user's details
+        // ✅ Fetch current user first
         const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -63,28 +63,30 @@ const Chat = () => {
           return;
         }
   
+        // Set the current user
         const currentUserData = currentUserResponse.data;
         setCurrentUser(currentUserData);
   
-        // ✅ Log currentUserId directly after setting the currentUser data
+        // ✅ Set currentUserId from the currentUserData (after fetching current user)
         const currentUserId = currentUserData._id;
         console.log("Current User ID:", currentUserId);
   
-        // ✅ Fetch messages
+        // Fetch messages
         const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
         setMessages(messagesResponse.data.messages || []);
-        console.log("✅ Messages Fetched:", messagesResponse.data.messages);
+        console.log("Fetched Messages:", messagesResponse.data.messages);
   
-        // ✅ Fetch receiver's user details
+        // Fetch user details (receiver)
         const userResponse = await api.get(`https://meethub-backend.onrender.com/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
         setUser(userResponse.data);
-        console.log("✅ Receiver User Data:", userResponse.data);
+        console.log("Receiver User Data:", userResponse.data);
+  
       } catch (err) {
         console.error("Error fetching chat data:", err);
       } finally {
@@ -97,13 +99,8 @@ const Chat = () => {
     // Initialize socket connection
     socket.current = io("https://meethub-backend.onrender.com");
   
-    socket.current.on("typing", () => {
-      setIsTyping(true);
-    });
-  
-    socket.current.on("stop_typing", () => {
-      setIsTyping(false);
-    });
+    socket.current.on("typing", () => setIsTyping(true));
+    socket.current.on("stop_typing", () => setIsTyping(false));
   
     socket.current.on("send_message", (data) => {
       console.log("📩 Incoming Message:", data);
@@ -112,10 +109,8 @@ const Chat = () => {
       }
     });
   
-    return () => {
-      socket.current.disconnect();
-    };
-  }, [userId]);
+    return () => socket.current.disconnect();
+  }, [userId]); // ✅ Only run when userId changes
   
   
   // Scroll to latest message
@@ -126,14 +121,14 @@ const Chat = () => {
   const handleSendMessage = async () => {
     if (message.trim()) {
       const newMessage = {
-        sender: { _id: currentUserId, name: currentUser.name, avatar: currentUser.avatar },
+        sender: { _id: currentUser._id, name: currentUser.name, avatar: currentUser.avatar },
         content: message,
         timestamp: new Date().toISOString(),
       };
   
-      setMessages((prevMessages) => [...prevMessages, newMessage]); // ✅ Update UI instantly
+      setMessages((prevMessages) => [...prevMessages, newMessage]); // Update UI instantly
   
-      setMessage(""); // ✅ Clear input field immediately
+      setMessage(""); // Clear input field immediately
   
       try {
         const token = localStorage.getItem("userToken");
