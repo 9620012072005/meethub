@@ -93,8 +93,13 @@ const Chat = () => {
           return;
         }
   
-        setCurrentUser(currentUserResponse.data);
-        console.log("✅ Current User Data:", currentUserResponse.data);
+        const currentUserData = currentUserResponse.data;
+        setCurrentUser(currentUserData);
+  
+        // ✅ Define currentUserId from currentUserData._id
+        const currentUserId = currentUserData._id;
+        console.log("✅ Current User ID:", currentUserId);
+        console.log("✅ Current User Data:", currentUserData);
   
         // ✅ Fetch messages
         const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
