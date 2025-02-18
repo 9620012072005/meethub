@@ -19,39 +19,9 @@ const Chat = () => {
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-        if (storedUser) {
-          setCurrentUser(storedUser);
-          return;
-        }
-  
-        const token = localStorage.getItem("userToken"); // Ensure token is retrieved correctly
-        if (!token) {
-          console.error("No token found");
-          return;
-        }
-  
-        const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
-        setCurrentUser(currentUserResponse.data);
-      } catch (err) {
-        console.error("Error fetching current user", err);
-      }
-    };
-  
-    fetchCurrentUser();
-  }, []);
-  
-  
-  const currentUserId = currentUser?._id; // Correct
 
-  console.log("Current User ID:", currentUserId);
   
+
 
 
   useEffect(() => {
@@ -97,7 +67,10 @@ const Chat = () => {
         setCurrentUser(currentUserData);
   
         // ✅ Define currentUserId from currentUserData._id
-        const currentUserId = currentUserData._id;
+        const currentUserId = currentUser?._id; // Correct
+
+        console.log("Current User ID:", currentUserId);
+        
         console.log("✅ Current User ID:", currentUserId);
         console.log("✅ Current User Data:", currentUserData);
   
