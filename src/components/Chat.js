@@ -16,14 +16,43 @@ const Chat = () => {
   const [user, setUser] = useState({});
   const [currentUser, setCurrentUser] = useState({});
   const [isTyping, setIsTyping] = useState(false);
-  const [currentUser_Id, setCurrentUserId] = useState(null); // Initialize with null
-
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
-  const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (storedUser) {
+          setCurrentUser(storedUser);
+          return;
+        }
   
-  const avatarURL = user?.avatar ? user.avatar.replace(/^http:\/\//i, "https://") : "/default-avatar.png";
-  const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
+        const token = localStorage.getItem("userToken"); // Ensure token is retrieved correctly
+        if (!token) {
+          console.error("No token found");
+          return;
+        }
+  
+        const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        setCurrentUser(currentUserResponse.data);
+      } catch (err) {
+        console.error("Error fetching current user", err);
+      }
+    };
+  
+    fetchCurrentUser();
+  }, []);
+  
+  
+  const currentUserId = currentUser?._id; // Correct
+
+  console.log("Current User ID:", currentUserId);
+  
+
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -65,7 +94,6 @@ const Chat = () => {
         }
   
         setCurrentUser(currentUserResponse.data);
-        setCurrentUserId(currentUserResponse.data._id); // Set currentUserId here
         console.log("✅ Current User Data:", currentUserResponse.data);
   
         // ✅ Fetch messages
@@ -95,24 +123,25 @@ const Chat = () => {
     // Initialize socket connection
     socket.current = io("https://meethub-backend.onrender.com");
   
-    socket.current.on("typing", () => setIsTyping(true));
-    socket.current.on("stop_typing", () => setIsTyping(false));
+    socket.current.on("typing", () => {
+      setIsTyping(true);
+    });
+  
+    socket.current.on("stop_typing", () => {
+      setIsTyping(false);
+    });
   
     socket.current.on("send_message", (data) => {
       console.log("📩 Incoming Message:", data);
-  
-      // Only update state if the message is for the correct chat
       if (data.roomId === userId) {
         setMessages((prevMessages) => [...prevMessages, data.message]);
       }
     });
   
-    return () => socket.current.disconnect();
-  }, [userId]);  // Re-run when userId changes
-  
-  // Now make sure to use currentUserId only after currentUser has been set
-  const currentUserId = currentUser?._id;
-  console.log("Current User ID:", currentUserId);
+    return () => {
+      socket.current.disconnect();
+    };
+  }, [userId]);
   
   // Scroll to latest message
   useEffect(() => {
@@ -155,52 +184,37 @@ const Chat = () => {
     socket.current.emit("typing", { roomId: userId, senderId: currentUserId });
   };
 
-  const getAvatarUrl = (avatarPath) => {
-    if (!avatarPath) return "/default-avatar.png";  // Return default avatar if no path
-    // Ensure the path starts with the Cloudinary base URL
-    const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
-    return avatarPath.startsWith("http") ? avatarPath : `${cloudinaryBaseURL}${avatarPath}`;
-  };
-  
+  const getAvatarUrl = (avatarPath) => avatarPath || "/default-avatar.png";
+
   useEffect(() => {
     const fetchChatData = async () => {
       try {
         const token = localStorage.getItem("userToken");
         if (!token) return console.error("No token found");
-  
+
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
-  
+
         // ✅ Fetch messages
         const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         console.log("Fetched Messages:", messagesResponse.data.messages); // ✅ Log message data
         setMessages(messagesResponse.data.messages || []);
-  
-        // ✅ Fetch receiver user details
+
+        // ✅ Fetch user details
         const userResponse = await api.get(`https://meethub-backend.onrender.com/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         console.log("Receiver User Data:", userResponse.data); // ✅ Log receiver data
         setUser(userResponse.data);
-  
-        // ✅ Fetch current user from localStorage or directly from API
+
+        // ✅ Fetch current user
         const storedUser = JSON.parse(localStorage.getItem("currentUser"));
         if (storedUser) {
           console.log("Current User Data:", storedUser); // ✅ Log current user data
           setCurrentUser(storedUser);
-          setCurrentUserId(storedUser._id);  // Set currentUserId from localStorage
-        } else {
-          // If no stored user, fetch from API (in case the user is updated)
-          const currentUserResponse = await api.get('https://meethub-backend.onrender.com/api/users/me', {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-  
-          console.log("Fetched Current User Data:", currentUserResponse.data); // ✅ Log current user data from API
-          setCurrentUser(currentUserResponse.data);
-          setCurrentUserId(currentUserResponse.data._id);  // Set currentUserId from API response
         }
       } catch (err) {
         console.error("Error fetching chat data:", err);
@@ -208,27 +222,27 @@ const Chat = () => {
         setLoading(false);
       }
     };
-  
+
     fetchChatData();
-  
+
     // ✅ Initialize socket connection
     socket.current = io("https://meethub-backend.onrender.com");
-  
-    socket.current.on("typing", () => setIsTyping(true));
-    socket.current.on("stop_typing", () => setIsTyping(false));
-  
-    socket.current.on("send_message", (data) => {
-      console.log("📩 Incoming Message:", data);
-  
-      // Only update state if the message is for the correct chat
-      if (data.roomId === userId) {
-        setMessages((prevMessages) => [...prevMessages, data.message]);
-      }
-    });
-  
-    return () => socket.current.disconnect();
-  }, [userId]);  // Re-run when userId changes
-  
+
+  socket.current.on("typing", () => setIsTyping(true));
+  socket.current.on("stop_typing", () => setIsTyping(false));
+
+  socket.current.on("send_message", (data) => {
+    console.log("📩 Incoming Message:", data);
+
+    // Only update state if the message is for the correct chat
+    if (data.roomId === userId) {
+      setMessages((prevMessages) => [...prevMessages, data.message]);
+    }
+  });
+
+  return () => socket.current.disconnect();
+}, [userId]);
+ // ✅ Only run when userId changes
   // userId should be the only dependency here.
   
   if (loading) {
