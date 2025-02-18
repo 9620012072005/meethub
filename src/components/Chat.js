@@ -23,7 +23,7 @@ const Chat = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await api.get("/auth/user");
+        const response = await api.get("/api/auth/currentUser");
         setCurrentUser(response.data); // ✅ Set currentUser here
       } catch (err) {
         console.error("Error fetching current user", err);
@@ -70,7 +70,7 @@ const Chat = () => {
         setCurrentUser(currentUserResponse.data); // ✅ Set currentUser
   
         // Fetch messages
-        const messagesResponse = await api.get(`/messages/${userId}`, {
+        const messagesResponse = await api.get(`/api/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
