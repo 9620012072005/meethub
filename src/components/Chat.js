@@ -19,15 +19,11 @@ const Chat = () => {
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
 
-
-  
-
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const response = await api.get("/auth/user");
-        setCurrentUser(response.data);
-        setCurrentUserId(response.data._id);
+        setCurrentUser(response.data); // ✅ Set currentUser here
       } catch (err) {
         console.error("Error fetching current user", err);
       }
@@ -65,13 +61,12 @@ const Chat = () => {
   
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
   
-        // ✅ Fetch current user from backend instead of local storage
+        // ✅ Fetch current user from backend
         const currentUserResponse = await api.get("/auth/user", {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        setCurrentUser(currentUserResponse.data);
-        setCurrentUserId(currentUserResponse.data._id);
+        setCurrentUser(currentUserResponse.data); // ✅ Set currentUser
   
         // Fetch messages
         const messagesResponse = await api.get(`/messages/${userId}`, {
@@ -113,6 +108,10 @@ const Chat = () => {
     return () => socket.current.disconnect();
   }, [userId]);
   
+  const handleTyping = () => {
+    socket.current.emit("typing", { roomId: userId, senderId: currentUser._id }); // ✅ Use currentUser._id
+  };
+  
   
   // Scroll to latest message
   useEffect(() => {
@@ -151,9 +150,6 @@ const Chat = () => {
     }
   };
   
-  const handleTyping = () => {
-    socket.current.emit("typing", { roomId: userId, senderId: currentUserId });
-  };
 
   const getAvatarUrl = (avatarPath) => avatarPath || "/default-avatar.png";
 
