@@ -18,6 +18,7 @@ const Chat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
+  const [currentUserId, setCurrentUserId] = useState("");
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -100,7 +101,7 @@ const Chat = () => {
   
     socket.current.on("send_message", (data) => {
       console.log("📩 Incoming Message:", data);
-      if (data.roomId === userId) {
+      if (data.roomId === currentUser._id) {
         setMessages((prevMessages) => [...prevMessages, data.message]);
       }
     });
@@ -109,7 +110,7 @@ const Chat = () => {
   }, [userId]);
   
   const handleTyping = () => {
-    socket.current.emit("typing", { roomId: userId, senderId: currentUser._id }); // ✅ Use currentUser._id
+    socket.current.emit("typing", { roomId: userId, senderId: currentUser._id });
   };
   
   
@@ -142,7 +143,7 @@ const Chat = () => {
   
         // Emit the message through Socket.io
         if (socket.current) {
-          socket.current.emit("send_message", { roomId: userId, message: newMessage });
+          socket.current.emit("send_message", { roomId: currentUser._id, message: newMessage });
         }
       } catch (err) {
         console.error("Failed to send message", err);
