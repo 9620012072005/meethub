@@ -22,7 +22,9 @@ const Chat = () => {
 
   
 
-
+  const currentUserId = currentUser?.id; // Correct
+  console.log("Current User ID:", currentUserId);
+  
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -50,68 +52,61 @@ const Chat = () => {
       try {
         const token = localStorage.getItem("userToken");
         if (!token) return console.error("No token found");
-  
+
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
-  
-        // ✅ Fetch current user first
-        const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
-        if (!currentUserResponse.data || !currentUserResponse.data._id) {
-          console.error("Failed to fetch current user");
+
+        // ✅ Get current user from local storage
+        const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (!storedUser || !storedUser._id) {
+          console.error("No current user found in localStorage");
           return;
         }
-  
-        // Set the current user
-        const currentUserData = currentUserResponse.data;
-        setCurrentUser(currentUserData);
-  
-        // ✅ Set currentUserId from the currentUserData (after fetching current user)
-        const currentUserId = currentUserData._id;
-        console.log("Current User ID:", currentUserId);
-  
+        
+        console.log("Current User Data:", storedUser);
+        setCurrentUser(storedUser);
+        setCurrentUserId(storedUser._id); // ✅ Set currentUserId
+
         // Fetch messages
-        const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
+        const messagesResponse = await api.get(`/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         setMessages(messagesResponse.data.messages || []);
         console.log("Fetched Messages:", messagesResponse.data.messages);
-  
-        // Fetch user details (receiver)
-        const userResponse = await api.get(`https://meethub-backend.onrender.com/api/users/${userId}`, {
+
+        // Fetch receiver's details
+        const userResponse = await api.get(`/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         setUser(userResponse.data);
         console.log("Receiver User Data:", userResponse.data);
-  
+
       } catch (err) {
         console.error("Error fetching chat data:", err);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchChatData();
-  
+
     // Initialize socket connection
     socket.current = io("https://meethub-backend.onrender.com");
-  
+
     socket.current.on("typing", () => setIsTyping(true));
     socket.current.on("stop_typing", () => setIsTyping(false));
-  
+
     socket.current.on("send_message", (data) => {
       console.log("📩 Incoming Message:", data);
       if (data.roomId === userId) {
         setMessages((prevMessages) => [...prevMessages, data.message]);
       }
     });
-  
+
     return () => socket.current.disconnect();
-  }, [userId]); // ✅ Only run when userId changes
-  
+  }, [userId]);
+
   
   // Scroll to latest message
   useEffect(() => {
