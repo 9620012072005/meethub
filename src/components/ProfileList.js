@@ -26,9 +26,9 @@ const ProfileList = () => {
   const [notifications, setNotifications] = useState({});
   const navigate = useNavigate();
   const socket = useRef(null);
-
+  const cloudinaryBaseURL = "https://res.cloudinary.com/dz4hvyd4n/image/upload/";
   const currentUserId = localStorage.getItem("currentUserId");
-
+ 
   useEffect(() => {
     if (!socket.current) {
       socket.current = io("https://meethub-backend.onrender.com");
@@ -115,7 +115,13 @@ const ProfileList = () => {
   if (profiles.length === 0) {
     return <Typography>No profiles found.</Typography>;
   }
-
+  const getAvatarUrl = (avatarPath) => {
+    // If avatarPath is provided, return it, otherwise return the default avatar URL.
+    return avatarPath && avatarPath.startsWith('http') 
+      ? avatarPath 
+      : "https://res.cloudinary.com/your-cloud-name/image/upload/v12345678/default-avatar.png";
+  };
+  
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h5" sx={{ fontWeight: "bold", marginBottom: 2 }}>
@@ -171,7 +177,7 @@ const ProfileList = () => {
               >
                 <Avatar
                   alt={profile.name}
-                  src={profile.avatar ? `https://meethub-backend.onrender.com${profile.avatar}` : "/default-avatar.png"}
+                  src={getAvatarUrl(profile.avatar)}
                   sx={{ width: 50, height: 50, marginRight: 2 }}
                 />
               </Badge>

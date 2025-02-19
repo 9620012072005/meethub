@@ -15,12 +15,16 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({});
   const [currentUser, setCurrentUser] = useState({});
+  const [currentUserId, setCurrentUserId] = useState(""); // Ensure this state is defined correctly
+
+
+
   const [isTyping, setIsTyping] = useState(false);
   const socket = useRef(null);
   const messagesEndRef = useRef(null);
 
   const storedUser = localStorage.getItem("currentUser");
-  const currentUserId = currentUser?.id; // Extract id properly
+  
   console.log("Current User ID:", currentUserId);
   
 
@@ -54,34 +58,30 @@ const Chat = () => {
   
         if (!userId || userId.length !== 24) return console.error("Invalid userId");
   
-        // ✅ Fetch the logged-in user's details
-        const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
-        if (!currentUserResponse.data || !currentUserResponse.data._id) {
-          console.error("Failed to fetch current user");
-          return;
-        }
-  
-        setCurrentUser(currentUserResponse.data);
-        console.log("✅ Current User Data:", currentUserResponse.data);
-  
-        // ✅ Fetch messages
+        // Fetch messages
         const messagesResponse = await api.get(`https://meethub-backend.onrender.com/api/messages/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
+        console.log("Fetched Messages:", messagesResponse.data.messages);
         setMessages(messagesResponse.data.messages || []);
-        console.log("✅ Messages Fetched:", messagesResponse.data.messages);
   
-        // ✅ Fetch receiver's user details
+        // Fetch user details
         const userResponse = await api.get(`https://meethub-backend.onrender.com/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
+        console.log("Receiver User Data:", userResponse.data);
         setUser(userResponse.data);
-        console.log("✅ Receiver User Data:", userResponse.data);
+  
+        const currentUserResponse = await api.get("https://meethub-backend.onrender.com/api/users/auth/currentUser", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        console.log("✅ Current User Data:", currentUserResponse.data);
+        setCurrentUser(currentUserResponse.data);
+        setCurrentUserId(currentUserResponse.data._id);
+  
       } catch (err) {
         console.error("Error fetching chat data:", err);
       } finally {
@@ -92,27 +92,32 @@ const Chat = () => {
     fetchChatData();
   
     // Initialize socket connection
-    socket.current = io("https://meethub-backend.onrender.com");
+    if (!socket.current) {
+      socket.current = io("https://meethub-backend.onrender.com");
   
-    socket.current.on("typing", () => {
-      setIsTyping(true);
-    });
+      socket.current.on("send_message", (data) => {
+        console.log("📩 Incoming Message:", data);
+        // Ensure the message is for the current chat room
+        if (data.roomId === userId) {
+          setMessages((prevMessages) => [...prevMessages, data.message]);
+        }
+      });
   
-    socket.current.on("stop_typing", () => {
-      setIsTyping(false);
-    });
+      socket.current.on("typing", () => {
+        setIsTyping(true);
+      });
   
-    socket.current.on("send_message", (data) => {
-      console.log("📩 Incoming Message:", data);
-      if (data.roomId === userId) {
-        setMessages((prevMessages) => [...prevMessages, data.message]);
-      }
-    });
+      socket.current.on("stop_typing", () => {
+        setIsTyping(false);
+      });
+    }
+  
+    socket.current.emit("join_room", { roomId: userId }); // Ensure both users are in the same room
   
     return () => {
       socket.current.disconnect();
     };
-  }, [userId]);
+  }, [userId]); // Only re-run when userId changes
   
   // Scroll to latest message
   useEffect(() => {
@@ -127,37 +132,47 @@ const Chat = () => {
         timestamp: new Date().toISOString(),
       };
   
-      setMessages((prevMessages) => [...prevMessages, newMessage]); // ✅ Update UI instantly
+      // Optimistically update the state for the sender
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
   
-      setMessage(""); // ✅ Clear input field immediately
+      setMessage(""); // Clear the input field
   
       try {
         const token = localStorage.getItem("userToken");
   
-        // Send message to backend
+        // Send message to the backend
         await api.post(
           "https://meethub-backend.onrender.com/api/messages/send",
           { receiverId: userId, content: message },
           { headers: { Authorization: `Bearer ${token}` } }
         );
   
-        // Emit the message through Socket.io
+        // Emit the message via Socket.io to the receiver
         if (socket.current) {
-          socket.current.emit("send_message", { roomId: userId, message: newMessage });
+          socket.current.emit("send_message", {
+            roomId: userId, // Receiver's roomId
+            message: newMessage, // The message object
+          });
         }
       } catch (err) {
         console.error("Failed to send message", err);
       }
     }
   };
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.emit("join_room", { roomId: userId }); // Ensure both users are in the same room
+    }
+  }, [userId]); // Re-run only when userId changes
   
   const handleTyping = () => {
     socket.current.emit("typing", { roomId: userId, senderId: currentUserId });
   };
 
   const getAvatarUrl = (avatarPath) => {
-    return avatarPath ? `https://meethub-backend.onrender.com${avatarPath}` : "/default-avatar.png";
+    return avatarPath ? avatarPath : "https://res.cloudinary.com/your-cloud-name/image/upload/v12345678/default-avatar.png";
   };
+  
   useEffect(() => {
     const fetchChatData = async () => {
       try {
@@ -182,12 +197,14 @@ const Chat = () => {
         console.log("Receiver User Data:", userResponse.data); // ✅ Log receiver data
         setUser(userResponse.data);
 
-        // ✅ Fetch current user
+        // Fetch current user data from API (or localStorage)
         const storedUser = JSON.parse(localStorage.getItem("currentUser"));
         if (storedUser) {
-          console.log("Current User Data:", storedUser); // ✅ Log current user data
           setCurrentUser(storedUser);
+          setCurrentUserId(storedUser._id); // Set the current user ID correctly from the fetched user data
+          console.log("✅ Current User Data:", storedUser);
         }
+
       } catch (err) {
         console.error("Error fetching chat data:", err);
       } finally {
@@ -205,12 +222,13 @@ const Chat = () => {
 
   socket.current.on("send_message", (data) => {
     console.log("📩 Incoming Message:", data);
-
-    // Only update state if the message is for the correct chat
+  
+    // Update the messages only if the message belongs to this chat
     if (data.roomId === userId) {
       setMessages((prevMessages) => [...prevMessages, data.message]);
     }
   });
+  
 
   return () => socket.current.disconnect();
 }, [userId]);

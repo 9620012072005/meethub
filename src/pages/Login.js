@@ -37,6 +37,7 @@ const Login = () => {
         password,
       }, {
         headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           "Content-Type": "application/json", // Ensure correct content type
         },
       });
